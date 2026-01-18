@@ -1,0 +1,43 @@
+﻿services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  api:
+    env_file:
+      - .env
+
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+
+      - DATABASE_URL=sqlite:////data/eventflow.db
+    volumes:
+      - ./data/eventflow.db:/app/eventflow.db
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  worker:
+    env_file:
+      - .env
+
+    build: .
+    command: python -m worker.worker
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+
+      - DATABASE_URL=sqlite:////data/eventflow.db
+    volumes:
+      - ./data/eventflow.db:/app/eventflow.db
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+
+
+
+
