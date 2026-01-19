@@ -1,14 +1,14 @@
-
 import os
 from datetime import datetime
-from fastapi import FastAPI, HTTPException
-from sqlalchemy.orm import Session
-from sqlalchemy import select
 
-from .db import init_db, SessionLocal
+from fastapi import FastAPI, HTTPException
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from .db import SessionLocal, init_db
 from .models import Order, OrderItem
-from .schemas import OrderCreate, OrderOut
 from .queue import get_queue, redis_ok
+from .schemas import OrderCreate, OrderOut
 from .tasks import process_order
 
 app = FastAPI(title="EventFlow Lite", version="0.1.0")
@@ -88,4 +88,3 @@ def list_orders(limit: int = 20):
         return [OrderOut.model_validate(o) for o in rows]
     finally:
         db.close()
-

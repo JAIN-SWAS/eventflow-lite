@@ -1,6 +1,6 @@
-
 from datetime import datetime
 from time import sleep
+
 from .db import SessionLocal
 from .models import Order
 
@@ -52,4 +52,3 @@ def process_order(order_id: int) -> dict:
         order.updated_at = datetime.utcnow()
         db.commit()
         return {"ok": True, "order_id": order_id, "risk_score": order.risk_score}
-

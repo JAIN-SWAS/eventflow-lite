@@ -1,7 +1,7 @@
-
 import os
+
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 DB_URL = os.getenv("EVENTFLOW_DB_URL", "sqlite:///./eventflow.db")
 
@@ -15,5 +15,5 @@ class Base(DeclarativeBase):
 
 def init_db() -> None:
     from . import models  # noqa: F401
-    Base.metadata.create_all(bind=engine)
 
+    Base.metadata.create_all(bind=engine)

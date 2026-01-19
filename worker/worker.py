@@ -1,9 +1,9 @@
-
 import os
+
 from redis import Redis
-from rq import Queue, Connection
-from rq.worker import SimpleWorker
+from rq import Connection, Queue
 from rq.timeouts import TimerDeathPenalty
+from rq.worker import SimpleWorker
 
 listen = ["default", "eventflow"]
 redis_url = os.getenv("REDIS_URL", "redis://redis:6379/0")
@@ -18,7 +18,3 @@ if __name__ == "__main__":
         worker = SimpleWorker(queues)
         worker.death_penalty_class = TimerDeathPenalty  # Windows-safe (no SIGALRM)
         worker.work()
-
-
-
-

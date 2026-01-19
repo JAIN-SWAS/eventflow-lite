@@ -1,7 +1,8 @@
-
 from datetime import datetime
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, Float
+
+from sqlalchemy import DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from .db import Base
 
 
@@ -38,4 +39,3 @@ class OrderItem(Base):
     price_cents: Mapped[int] = mapped_column(Integer)
 
     order: Mapped["Order"] = relationship(back_populates="items")
-

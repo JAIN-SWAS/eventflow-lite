@@ -1,5 +1,5 @@
-
 import os
+
 from redis import Redis
 from rq import Queue
 
@@ -18,4 +18,3 @@ def redis_ok() -> bool:
         return bool(get_redis().ping())
     except Exception:
         return False
-
