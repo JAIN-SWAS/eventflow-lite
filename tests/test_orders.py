@@ -1,0 +1,99 @@
+import os
+import time
+from pathlib import Path
+
+# ----------------------------
+# IMPORTANT:
+# Set env BEFORE importing app
+# ----------------------------
+
+# Use local Redis (Docker Redis mapped to localhost:6379)
+os.environ.setdefault("REDIS_URL", "redis://127.0.0.1:6379/0")
+
+# Use a separate local SQLite DB for tests
+os.environ.setdefault("DATABASE_URL", "sqlite:///./data/test_eventflow.db")
+os.environ.setdefault("ENV", "test")
+
+# Ensure local folder exists
+Path("data").mkdir(exist_ok=True)
+
+# Optional: reset test DB each run (clean slate)
+test_db = Path("data/test_eventflow.db")
+if test_db.exists():
+    test_db.unlink()
+
+
+from fastapi.testclient import TestClient  # noqa: E402
+from redis import Redis  # noqa: E402
+from rq import Connection, Queue  # noqa: E402
+from rq.worker import SimpleWorker  # noqa: E402
+from rq.timeouts import TimerDeathPenalty  # noqa: E402
+
+from app.main import app  # noqa: E402
+
+
+client = TestClient(app)
+
+
+def run_worker_once():
+    """
+    Runs the RQ worker in burst mode (process once then exit).
+    Fixes Windows issue (no SIGALRM) using TimerDeathPenalty.
+    """
+    redis_conn = Redis.from_url(os.environ["REDIS_URL"])
+
+    q_default = Queue("default", connection=redis_conn)
+    q_eventflow = Queue("eventflow", connection=redis_conn)
+
+    worker = SimpleWorker([q_default, q_eventflow], connection=redis_conn)
+
+    # ✅ Windows fix for SIGALRM error
+    worker.death_penalty_class = TimerDeathPenalty
+
+    with Connection(redis_conn):
+        worker.work(burst=True)
+
+
+def test_create_order_then_complete():
+    payload = {
+        "customer_id": "cust_test_1",
+        "notes": "urgent delivery please",
+        "items": [
+            {"sku": "latte", "qty": 2, "price_cents": 550},
+            {"sku": "muffin", "qty": 1, "price_cents": 350},
+        ],
+    }
+
+    # ✅ Clean Redis queues before test
+    redis_conn = Redis.from_url(os.environ["REDIS_URL"])
+    Queue("default", connection=redis_conn).empty()
+    Queue("eventflow", connection=redis_conn).empty()
+
+    # 1) Create order
+    r = client.post("/orders", json=payload)
+    assert r.status_code == 200
+
+    created = r.json()
+    assert "id" in created
+    assert created["status"] == "queued"
+    order_id = created["id"]
+
+    # 2) Run worker once to process the job
+    run_worker_once()
+
+    # 3) Poll until completed (max ~6 seconds)
+    final = None
+    for _ in range(30):
+        rr = client.get(f"/orders/{order_id}")
+        assert rr.status_code == 200
+        final = rr.json()
+
+        if final["status"] == "completed":
+            break
+
+        time.sleep(0.2)
+
+    assert final is not None
+    assert final["status"] == "completed"
+    assert final["risk_score"] is not None
+    assert float(final["risk_score"]) >= 0.0
