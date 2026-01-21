@@ -30,4 +30,7 @@ build/
 
 # docker
 *.pid
+# Local databases (do not commit)
+*.db
+data/*.db
 
