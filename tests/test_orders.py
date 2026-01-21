@@ -26,11 +26,10 @@ if test_db.exists():
 from fastapi.testclient import TestClient  # noqa: E402
 from redis import Redis  # noqa: E402
 from rq import Connection, Queue  # noqa: E402
-from rq.worker import SimpleWorker  # noqa: E402
 from rq.timeouts import TimerDeathPenalty  # noqa: E402
+from rq.worker import SimpleWorker  # noqa: E402
 
 from app.main import app  # noqa: E402
-
 
 client = TestClient(app)
 
