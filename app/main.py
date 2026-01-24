@@ -10,13 +10,15 @@ from .models import Order, OrderItem
 from .queue import get_queue, redis_ok
 from .schemas import OrderCreate, OrderOut
 from .tasks import process_order
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    yield
+
 
 app = FastAPI(title="EventFlow Lite", version="0.1.0")
-
-
-@app.on_event("startup")
-def on_startup():
-    init_db()
 
 
 @app.get("/health")
