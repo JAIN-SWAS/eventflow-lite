@@ -1,27 +1,5 @@
 import os
 import time
-from pathlib import Path
-
-# ----------------------------
-# IMPORTANT:
-# Set env BEFORE importing app
-# ----------------------------
-
-# Use local Redis (Docker Redis mapped to localhost:6379)
-os.environ.setdefault("REDIS_URL", "redis://127.0.0.1:6379/0")
-
-# Use a separate local SQLite DB for tests
-os.environ.setdefault("DATABASE_URL", "sqlite:///./data/test_eventflow.db")
-os.environ.setdefault("ENV", "test")
-
-# Ensure local folder exists
-Path("data").mkdir(exist_ok=True)
-
-# Optional: reset test DB each run (clean slate)
-test_db = Path("data/test_eventflow.db")
-if test_db.exists():
-    test_db.unlink()
-
 
 from fastapi.testclient import TestClient  # noqa: E402
 from redis import Redis  # noqa: E402
