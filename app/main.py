@@ -15,7 +15,7 @@ app = FastAPI(title="EventFlow Lite", version="0.1.0")
 
 
 @app.on_event("startup")
-def _startup() -> None:
+def on_startup():
     init_db()
 
 
