@@ -21,8 +21,10 @@ jobs:
 
     env:
       REDIS_URL: redis://localhost:6379/0
+      DATABASE_URL: sqlite:///./data/test_eventflow.db
       ENV: ci
-
+      EVENTFLOW_SYNC_TASKS: "1"
+      
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
