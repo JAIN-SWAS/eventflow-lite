@@ -15,5 +15,5 @@ class Base(DeclarativeBase):
 
 def init_db() -> None:
     from . import models  # noqa: F401
-    from .models import Order, OrderItem
+    from .models import Order
     Base.metadata.create_all(bind=engine)
