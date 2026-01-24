@@ -7,7 +7,7 @@ from rq import Connection, Queue  # noqa: E402
 from rq.timeouts import TimerDeathPenalty  # noqa: E402
 from rq.worker import SimpleWorker  # noqa: E402
 
-from app.db import init_db  # noqa: E402
+from app.db import init_db  # noqa: E402, F401
 from app.main import app  # noqa: E402
 
 # Initialize database tables before running tests
