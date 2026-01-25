@@ -11,8 +11,6 @@ from app.db import init_db
 from app.main import app
 
 
-# Initialize database tables before running tests
-init_db()
 
 
 def run_worker_once():
