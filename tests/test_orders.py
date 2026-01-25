@@ -1,11 +1,20 @@
 import os
 import time
+<<<<<<< HEAD
 
 from fastapi.testclient import TestClient
 from redis import Redis
 from rq import Connection, Queue
 from rq.timeouts import TimerDeathPenalty
 from rq.worker import SimpleWorker
+=======
+from pathlib import Path
+from app.db import init_db
+# ----------------------------
+# IMPORTANT:
+# Set env BEFORE importing app
+# ----------------------------
+>>>>>>> 558be9f (Fix: create DB tables before running tests)
 
 from app.db import init_db
 from app.main import app
@@ -34,7 +43,10 @@ def run_worker_once():
 
 def test_create_order_then_complete():
     init_db()
+<<<<<<< HEAD
     
+=======
+>>>>>>> 558be9f (Fix: create DB tables before running tests)
     payload = {
         "customer_id": "cust_test_1",
         "notes": "urgent delivery please",
