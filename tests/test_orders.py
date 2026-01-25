@@ -1,13 +1,15 @@
 import os
 import time
-from fastapi.testclient import TestClient  # noqa: E402
-from redis import Redis  # noqa: E402
-from rq import Connection, Queue  # noqa: E402
-from rq.timeouts import TimerDeathPenalty  # noqa: E402
-from rq.worker import SimpleWorker  # noqa: E402
 
-from app.db import init_db  # noqa: E402, F401
-from app.main import app  # noqa: E402
+from fastapi.testclient import TestClient
+from redis import Redis
+from rq import Connection, Queue
+from rq.timeouts import TimerDeathPenalty
+from rq.worker import SimpleWorker
+
+from app.db import init_db
+from app.main import app
+
 
 # Initialize database tables before running tests
 init_db()
@@ -35,6 +37,8 @@ def run_worker_once():
 
 
 def test_create_order_then_complete():
+    init_db()
+    
     payload = {
         "customer_id": "cust_test_1",
         "notes": "urgent delivery please",
