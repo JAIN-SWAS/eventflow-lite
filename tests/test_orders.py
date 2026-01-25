@@ -14,8 +14,6 @@ from app.main import app
 # Initialize database tables before running tests
 init_db()
 
-client = TestClient(app)
-
 
 def run_worker_once():
     """
@@ -52,6 +50,10 @@ def test_create_order_then_complete():
     redis_conn = Redis.from_url(os.environ["REDIS_URL"])
     Queue("default", connection=redis_conn).empty()
     Queue("eventflow", connection=redis_conn).empty()
+
+    with TestClient(app) as client:
+        r = client.post("/orders", json=payload)
+        assert r.status_code == 201
 
     # 1) Create order
     r = client.post("/orders", json=payload)
